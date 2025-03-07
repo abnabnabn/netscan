@@ -1,0 +1,14 @@
+# config/settings.toml
+
+[general]
+json_file = "device_data.json"
+router_type = 'asus_router'
+
+[asus_router]
+ssh_timeout = 10
+# https://github.com/dynaconf/dynaconf/issues/1261
+# setting router ip using @format until above bug fixed - want to specify default 
+# value here and override with env var
+# Use EXPORT ROUTER_IP=ip address, eg EXPORT ROUTER_IP=192.168.1.1 for now
+router_ip = "@format {env[ROUTER_IP]}"
+router_user = "admin"
