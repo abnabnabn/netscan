@@ -256,9 +256,10 @@ def validate_scan_results(current_devices_list: List[Dict], json_list: List[Dict
     missing_devices = []
     current_ips = {d['ip'] for d in current_devices_list}
     json_ips = {d['ip'] for d in json_list if d.get('status') == 'online'}
+    additional_json_ips = {ip for d in json_list for ip in d.get('additional_ips', [])}
 
     for ip in current_ips:
-        if ip not in json_ips:
+        if ip not in json_ips and ip not in additional_json_ips:
             # Find the corresponding device in current_devices for more info
             for device in current_devices_list:
                 if device['ip'] == ip:
@@ -273,7 +274,7 @@ def validate_scan_results(current_devices_list: List[Dict], json_list: List[Dict
         # raise ValueError("Scan results validation failed.")
     else:
         logger.info("Validation successful: All router-reported devices are present in the scan results.")
-
+        
 def _prepare_for_comparison(json_list: List[Dict]) -> str:
     """Prepares the JSON data for comparison by removing last_seen and sorting."""
     # Create a deep copy to avoid modifying the original list
