@@ -8,8 +8,8 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 def format_mac(mac: str) -> str:
-    """Formats a MAC address to lowercase with colons."""
-    return mac.lower().replace("-", ":")
+    """Formats a MAC address to uppercase with minus (-) deliminater."""
+    return mac.upper().replace(":", "-")
 
 def is_valid_ipv4(ip: str) -> bool:
     """Checks if a string is a valid IPv4 address."""

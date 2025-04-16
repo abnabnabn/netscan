@@ -6,6 +6,7 @@ from pathlib import Path
 from datetime import datetime
 import ipaddress
 import json
+import sys
 
 from device import Device
 from routers import get_router
@@ -14,12 +15,18 @@ from utils import format_mac, is_valid_ipv4, SSHClient
 from dynaconf import Dynaconf
 from mac_vendor_lookup import MacLookup
 
-# Load settings
+logger = logging.getLogger(__name__)
+
+settings_path = Path('config/settings.toml')
+if not settings_path.exists():
+    logger.error(f"Config file not found at: {settings_path.absolute()}")
+    sys.exit(1)
+
 config = Dynaconf(
-    settings_files=['config/settings.toml'],
+    settings_files=[str(settings_path)],
+    load_dotenv=True,
 )
 
-logger = logging.getLogger(__name__)
 
 def add_new_device(current_devices: Dict[str, Dict], hostname: str | None, mac: str, ip: str):
     """Adds a new device to the current_devices dictionary."""
@@ -344,7 +351,15 @@ def main():
     parser = argparse.ArgumentParser(description="Network device scanner")
     parser.add_argument("--update-mac-db", action="store_true", help="Force update of the MAC vendor database")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
+    parser.add_argument("--router-ip", help="Router IP address (overrides config)", required=False)
     args = parser.parse_args()
+
+    if args.router_ip:
+        # Update config with the command line router_ip
+        config.set('asus_router.router_ip', args.router_ip)
+    elif not config.asus_router.router_ip:
+        print("\nPlease specify --router-ip or configure in settings.toml or set ROUTER_IP environment variable.\n")
+        sys.exit(1)
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
