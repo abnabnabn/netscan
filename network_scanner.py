@@ -246,14 +246,10 @@ def update_device_data(current_devices: Dict[str, Dict], json_list: List[Dict], 
 
     return json_list, updated
 
-def populate_vendor_and_name(json_list: List[Dict], mac_lookup: MacLookup):
+def populate_vendor_and_name(json_list: List[Dict]):
     """Populates the 'vendor' and 'name' fields in the device list."""
     for device in json_list:
-        try:
-            device['vendor'] = mac_lookup.lookup(device['mac'])
-        except Exception as e:
-            logger.debug(f"Could not determine vendor for MAC {device.get('mac')}: {e}") # Changed to debug
-            device['vendor'] = None
+        device['vendor'] = get_vendor_from_mac(device['mac'])
 
         if not device.get('name'):
             device['name'] = device.get('hostname') or device.get('vendor') or "Unknown Device"
@@ -291,7 +287,11 @@ def _prepare_for_comparison(json_list: List[Dict]) -> str:
     return json.dumps(comparable_list, sort_keys=True)
 
 def get_vendor_from_mac(mac_address):
-    return MacLookup().lookup(mac_address)
+    try:
+        return MacLookup().lookup(mac_address)
+    except KeyError:
+        logger.debug(f"Vendor not found for MAC address: {mac_address}")
+        return None # Return None if vendor not found
 
 def run_scan(update_mac_db: bool = False):
     """Main function to perform the network scan."""
@@ -321,8 +321,7 @@ def run_scan(update_mac_db: bool = False):
     updated_json_list, _ = update_device_data(current_devices, json_list, original_json_list) # We don't need the flag
 
     # --- Populate Vendor and Name ---
-    mac_lookup = MacLookup()  # Create instance: automatic updates happen here
-    populate_vendor_and_name(updated_json_list, mac_lookup)
+    populate_vendor_and_name(updated_json_list)
 
     # --- Sort by IP Address ---
     updated_json_list.sort(key=lambda d: ipaddress.IPv4Address(d['ip']))
