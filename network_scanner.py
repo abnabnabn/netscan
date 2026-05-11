@@ -17,15 +17,17 @@ from mac_vendor_lookup import MacLookup
 
 logger = logging.getLogger(__name__)
 
-settings_path = Path('config/settings.toml')
-if not settings_path.exists():
-    logger.error(f"Config file not found at: {settings_path.absolute()}")
-    sys.exit(1)
+def load_config(settings_path: Path = Path('config/settings.toml')) -> Dynaconf:
+    if not settings_path.exists():
+        logger.warning(f"Config file not found at: {settings_path.absolute()}")
+        return Dynaconf() # Return empty config for tests/fallback
 
-config = Dynaconf(
-    settings_files=[str(settings_path)],
-    load_dotenv=True,
-)
+    return Dynaconf(
+        settings_files=[str(settings_path)],
+        load_dotenv=True,
+    )
+
+config = load_config()
 
 
 def add_new_device(current_devices: Dict[str, Dict], hostname: str | None, mac: str, ip: str):

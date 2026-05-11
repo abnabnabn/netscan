@@ -101,6 +101,15 @@ class AsusRouter(BaseRouter):
             return None
 
         _, mac, ip, hostname, *_ = parts + ["*"]
+        
+        # Basic validation to avoid parsing 'starts', 'ends', etc. in ISC leases
+        if not re.match(r"^([\da-f]{2}[:\-]){5}[\da-f]{2}$", mac, re.IGNORECASE):
+            return None
+        
+        from utils import is_valid_ipv4
+        if not is_valid_ipv4(ip):
+            return None
+
         mac = format_mac(mac)
         hostname = None if hostname == "*" else hostname
 

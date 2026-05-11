@@ -3,9 +3,15 @@ import os
 from routers import get_router  # Import the factory
 from dynaconf import Dynaconf
 
-config = Dynaconf(
-    settings_files=['config/settings.toml']
-)
+from pathlib import Path
+
+def load_config() -> Dynaconf:
+    settings_path = Path('config/settings.toml')
+    if not settings_path.exists():
+        return Dynaconf()
+    return Dynaconf(settings_files=[str(settings_path)])
+
+config = load_config()
 def main():
     """Simple test script to fetch and display device data."""
 

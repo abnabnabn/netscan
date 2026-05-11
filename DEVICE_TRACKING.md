@@ -53,6 +53,28 @@ Devices that aren't found in the current scan are marked as `offline` rather tha
 
 ---
 
+## Managing Device Names
+
+NetScan provides two fields for identifying your devices: `hostname` and `name`.
+
+### Automatic Hostnames
+The `hostname` field is automatically populated and updated during every scan based on the information reported by your router. If a device changes its network name, NetScan will reflect that change here. **Manual changes to this field will be overwritten.**
+
+### Persistent User-Defined Names
+The `name` field is intended for your own persistent labels (e.g., "Living Room TV" or "Dad's Phone"). 
+* **Behavior:** NetScan only populates this field if it is currently empty (using the hostname or vendor as a fallback). 
+* **Persistence:** Once you manually set a value in the `name` field, NetScan will **never** overwrite it.
+
+### How to Set a Persistent Name
+1. Open your `device_data.json` file.
+2. Locate the device entry you wish to name (searching by MAC address is most reliable).
+3. Update the `"name"` property with your desired label.
+4. Save the file.
+
+> **Note:** Ensure the scanner is not running when you manually edit the JSON file to prevent your changes from being overwritten by a concurrent save operation.
+
+---
+
 ## Appendix: The "Why" and The Future
 
 ### Why This Complexity?

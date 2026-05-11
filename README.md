@@ -8,6 +8,8 @@ netscan is a Python-based network scanning tool designed to discover devices on 
 
 netscan uses a combination of techniques to identify devices on the network. It connects to an ASUS router via SSH, retrieves the ARP table and DHCP leases, and parses this data to identify connected devices. The tool leverages the `paramiko` library for SSH communication, `re` for parsing text, and `dynaconf` for configuration management.
 
+For more details on how devices are identified and tracked across scans, see [DEVICE_TRACKING.md](DEVICE_TRACKING.md).
+
 Here's a high-level architecture diagram:
 
 ```plantuml
